@@ -1,0 +1,4 @@
+interface:
+  display_name: "得到大脑与临时视频转写"
+  short_description: "浏览器读写知识库，或临时视频转文字；资源清理仅限云端"
+  default_prompt: "使用 $getnote-browser 按我的用途选择知识库保存或不入库临时转写；只在明确的云端环境清理本任务的临时资源。"
