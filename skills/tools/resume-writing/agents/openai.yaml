@@ -1,0 +1,4 @@
+interface:
+  display_name: "通用简历写作"
+  short_description: "从真实经历梳理到通用初稿、岗位匹配和迭代，保留个人贡献与事实边界。"
+  default_prompt: "使用 $resume-writing，根据我提供的真实经历和目标岗位，帮我完成或修改简历。"
