@@ -11,8 +11,9 @@
 | 产品经理 | 产品经理 Skill：机会评估、PRD、路线图、GTM | [产品经理](产品经理/README.md) |
 | 漫剧提示词 | 分类说明占位，具体提示词包尚待选择 | [漫剧提示词](漫剧提示词/README.md) |
 | 工具操作 | 得到大脑浏览器与云端临时视频转写 Skill | [得到大脑 Skill](skills/tools/getnote-browser/SKILL.md) |
+| 工具操作 | 简历工具包：找模板 + 写简历 + 优化润色，中英文 ATS 友好 | [简历 Skill](skills/tools/resume-builder/SKILL.md) |
 
-当前收录 3 套完整 Skill；文章与漫剧提示词先放分类说明，不把尚未上传的内容写成已收录。
+当前收录 4 套完整 Skill；文章与漫剧提示词先放分类说明，不把尚未上传的内容写成已收录。
 
 ## 放置方式
 
