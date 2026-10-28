@@ -1,0 +1,25 @@
+{
+  "version": "2026-07-18-coverage-v2",
+  "source_counts": {
+    "xiaohongshu_traffic_records": 234,
+    "xiaohongshu_compliance_records": 385,
+    "xlsx_nonempty_cells": 1016,
+    "xlsx_content_rows": 236,
+    "xlsx_compiled_records_rows_4_plus": 989,
+    "pdf_pages": 22,
+    "pdf_nonempty_text_pages": 21,
+    "douyin_behavior_rules": 34
+  },
+  "source_sha256": {
+    "xiaohongshu_traffic": "1450048ea41ba9f50c27509e3202313710e180c71b63db3c9429e5ba211d6c8e",
+    "xiaohongshu_compliance": "2aa214bc1d13d36d22cc3b91bf4a04662871791c8ab62d856b7b9cf4fa945325",
+    "prohibited_terms": "cd420090de16e257ebe31539d418717953252cb959222a41c89669e2c0a31b20",
+    "douyin_guide": "7c130181b6311d00384f4ac357c4cc7a032778ec9a174957f6e155a4e898f33f"
+  },
+  "checks": {
+    "all_xlsx_cells_rows_4_plus_have_lexicon_records": true,
+    "all_34_douyin_behavior_numbers_present": true,
+    "pdf_page_22_visually_reviewed_as_back_cover": true
+  },
+  "scope_statement": "Complete relative to the four supplied files; platform rules can change and official live review still controls."
+}

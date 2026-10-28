@@ -1,0 +1,4 @@
+interface:
+  display_name: "全渠道短视频合规检查"
+  short_description: "一个 Skill 检查小红书与抖音文案、口播、字幕、画面、带货和直播风险"
+  default_prompt: "Use $check-social-content-compliance 完整检查这份内容在小红书、抖音发布前的文案、口播、字幕、画面、交易和行为风险，并给出最小修改。"

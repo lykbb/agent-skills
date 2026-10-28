@@ -1,0 +1,6 @@
+interface:
+  display_name: "小红书图文流程"
+  short_description: "衔接分页文案、标题封面、视觉风格与逐页制作，只推进当前授权的内容范围"
+  default_prompt: "用 $xiaohongshu-post 按现有稿件进度继续小红书图文，保留已确认内容。"
+policy:
+  allow_implicit_invocation: true

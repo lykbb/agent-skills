@@ -1,0 +1,6 @@
+interface:
+  display_name: "社交内容总入口"
+  short_description: "按长文、小红书图文或短帖分流，读取对应流程并保留当前阶段与已确认内容"
+  default_prompt: "用 $social-content-studio 判断我的内容文体，并进入对应入口的当前阶段。"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "内容调研与事实核验"
+  short_description: "为长文和小红书图文补充可靠资料，保留来源、日期、反例和事实边界"
+  default_prompt: "用 $content-research 核验这个选题的关键事实，给出可写依据和资料缺口。"
+policy:
+  allow_implicit_invocation: true

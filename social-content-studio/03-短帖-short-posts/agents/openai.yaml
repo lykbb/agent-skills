@@ -1,0 +1,6 @@
+interface:
+  display_name: "短帖与推文串"
+  short_description: "热点、想法、长文摘句快速写成可直接发布的短帖或推文串"
+  default_prompt: "用 $short-posts 把这个写成一条短帖。"
+policy:
+  allow_implicit_invocation: true

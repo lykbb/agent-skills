@@ -1,0 +1,4 @@
+interface:
+  display_name: "选题大纲"
+  short_description: "为中文长文生成选题、标题和可执行大纲"
+  default_prompt: "使用 $huashu-topic-gen，根据我的主题、材料和发布平台生成文章大纲，并说明需要补充哪些事实或体验。"

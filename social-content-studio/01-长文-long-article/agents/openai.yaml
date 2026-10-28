@@ -1,0 +1,6 @@
+interface:
+  display_name: "中文长文流程"
+  short_description: "按已有进度衔接选题、大纲、正文、配图与复核，支持从指定阶段直接继续"
+  default_prompt: "用 $long-article 按长文流程处理这个选题，先检查已有材料和当前阶段。"
+policy:
+  allow_implicit_invocation: true

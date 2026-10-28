@@ -1,0 +1,6 @@
+interface:
+  display_name: "长文配图与流程图编排"
+  short_description: "围绕已定文章安排配图位置、图种和完整文字，再按授权交接静态图片制作"
+  default_prompt: "用 $article-visuals 为这篇已定长文安排配图位置、图种和图内文字。"
+policy:
+  allow_implicit_invocation: true

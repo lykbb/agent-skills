@@ -1,0 +1,4 @@
+interface:
+  display_name: "写作skill"
+  short_description: "基于真实材料撰写和修改中文平台长文，也支持个人观点短文与自然表达润色"
+  default_prompt: "使用 $writing-skill，按我的篇幅和文体要求，把材料写成或润色为适合平台发布的中文长文或个人观点短文，保留我的口吻并核准事实。"

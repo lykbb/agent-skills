@@ -1,0 +1,12 @@
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.py[cod]
+node_modules/
+.env
+.env.*
+*.local.json
+*.local.yaml
+*.local.yml
+references/visual-good-examples/*.png
+references/visual-cases/**/*.png
