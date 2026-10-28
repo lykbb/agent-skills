@@ -1,0 +1,4 @@
+interface:
+  display_name: "Yukun 产品开发工作流"
+  short_description: "衔接立项报告、需求与架构蓝图，再实施并验证独立项目中的本地 MVP"
+  default_prompt: "请用 $yukun-product-workflow 读取我的想法或已有项目，从当前阶段推进到可验证的本地 MVP。"

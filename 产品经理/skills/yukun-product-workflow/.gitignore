@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/
+.venv/
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+modules/agent-blueprint/out/
+*.local.json
+*.local.yaml
