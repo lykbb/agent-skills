@@ -67,10 +67,9 @@ Use `box-sizing:border-box`, fixed safe margins, and `overflow:hidden`.
 
 For WeChat covers:
 
-- Compose `wechat-21x9` and `wechat-1x1` as separate source frames.
-- Also include `wechat-pair-preview` in the same HTML so the pair can be inspected together.
-- Export the two real deliverables separately.
-- Export the pair preview only when helpful for review.
+- Default to one `wechat-21x9` headline cover (see platform-specs.md).
+- Add `wechat-1x1` as a separate source frame only when the user explicitly asks for the square share cover, and export it as a separate deliverable.
+- Add `wechat-pair-preview` only when the user asks to inspect the pair side by side; it is a review frame, never a default deliverable.
 - The `1:1` cover should use a simplified title derived from the long title, not a crop or text squeeze from the `2.35:1` frame.
 
 For electronic-magazine pages, place background canvases inside each `.poster` instead of relying only on CSS color:
@@ -109,6 +108,7 @@ const targets = [
   ["#xhs-01", "xhs-01-cover.png"],
   ["#xhs-02", "xhs-02-point.png"],
   ["#wechat-21x9", "wechat-235-cover.png"],
+  // the next two only when the user asked for the square cover or a pair preview
   ["#wechat-1x1", "wechat-1x1-cover.png"],
   ["#wechat-pair-preview", "wechat-cover-pair-preview.png"],
 ];

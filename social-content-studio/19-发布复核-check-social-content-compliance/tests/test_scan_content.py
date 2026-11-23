@@ -74,6 +74,64 @@ class ScannerTests(unittest.TestCase):
         }
         self.assertEqual(behavior_numbers, set(range(1, 35)))
 
+    def test_latin_terms_do_not_fire_inside_longer_english_words(self):
+        result = run_scan("这个 product 是今年的 PROJECT，先在 desktop 上跑通，maximum 并发先不调，CTO 也同意，Act 和 Stop 两个按钮先不做。")
+        matched = {item["matched"] for item in result["findings"]}
+        self.assertFalse(matched & {"ct", "top", "max"})
+
+    def test_latin_terms_still_fire_as_standalone_words(self):
+        result = run_scan("做了CT检查，销量TOP1，含hEGF成分，Top-K 也算，还有 ProMax 和两个 MVPs。")
+        matched = [item["matched"] for item in result["findings"]]
+        self.assertIn("ct", matched)
+        self.assertIn("egf", matched)
+        self.assertIn("max", matched)
+        self.assertIn("mvp", matched)
+        self.assertEqual(matched.count("top"), 2)
+
+    def test_short_lexicon_terms_are_hints_for_non_commercial_content(self):
+        text = "我试用了这个智能排序功能，用户还愿意继续用。"
+        graded = run_scan(text)
+        self.assertTrue(any(item["severity"] in {"high", "medium"} for item in graded["findings"]))
+        self.assertEqual(graded["counts"]["hint"], 0)
+        relaxed = run_scan(text, "--commercial", "no")
+        self.assertEqual({item["matched"] for item in relaxed["findings"]}, {item["matched"] for item in graded["findings"]})
+        self.assertTrue(all(item["severity"] == "hint" for item in relaxed["findings"]))
+        self.assertEqual(relaxed["counts"]["high"] + relaxed["counts"]["medium"] + relaxed["counts"]["review"], 0)
+
+    def test_strong_claims_stay_graded_for_non_commercial_content(self):
+        result = run_scan("这款茶能延年益寿，想了解可以加微信。", "--commercial", "no")
+        graded = {item["matched"]: item["severity"] for item in result["findings"]}
+        self.assertEqual(graded.get("延年益寿"), "high")
+        self.assertTrue(
+            any("私下联系" in item["category"] and item["severity"] == "high" for item in result["findings"])
+        )
+
+    def test_hint_does_not_mask_overlapping_graded_term(self):
+        result = run_scan("这是中医院自制的药膏。", "--commercial", "no")
+        graded = {item["matched"]: item["severity"] for item in result["findings"]}
+        self.assertEqual(graded.get("中医"), "hint")
+        self.assertEqual(graded.get("医院自制"), "high")
+
+    def test_markdown_folds_hints_into_one_line_per_term(self):
+        text = "第一步先写一段，第一版再改一段。"
+        command = [
+            sys.executable,
+            str(SCANNER),
+            "--platform",
+            "both",
+            "--text",
+            text,
+            "--commercial",
+            "no",
+            "--format",
+            "markdown",
+        ]
+        report = subprocess.run(command, check=True, capture_output=True, text=True).stdout
+        self.assertIn("短词提示 4", report)
+        self.assertIn("无需要定级的文字命中。", report)
+        self.assertEqual(report.count("- `第一` ×2"), 1)
+        self.assertEqual(report.count("- `一段` ×2"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

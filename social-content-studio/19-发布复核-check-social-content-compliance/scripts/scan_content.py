@@ -9,10 +9,11 @@ from collections import Counter
 from pathlib import Path
 
 
-SEVERITY_ORDER = {"high": 0, "medium": 1, "review": 2}
-SEVERITY_LABEL = {"high": "高风险", "medium": "需修改", "review": "人工复核"}
+SEVERITY_ORDER = {"high": 0, "medium": 1, "review": 2, "hint": 3}
+SEVERITY_LABEL = {"high": "高风险", "medium": "需修改", "review": "人工复核", "hint": "短词提示"}
 NEGATION_OR_EDUCATION = re.compile(r"(?:禁止|严禁|避免|不要|不得|不能|不应|不可|违规词|违禁词|错误示例|反例|不代表|并非).{0,10}$")
 REGULATED_PRODUCT_TYPES = {"drug", "device", "health-food", "medical-service"}
+SHORT_TERM_HINT_NOTE = "词表短词，当前标记为非商业内容，只提示不定级：确认这里不是在替商品或服务做宣称即可，普通叙述不必改写。"
 
 
 def parse_args() -> argparse.Namespace:
@@ -50,6 +51,38 @@ def term_pattern(term: str) -> str:
     normalized = normalize(term)
     separator = r"[\s._·•*#~—\-\/]*"
     return separator.join(re.escape(char) for char in normalized)
+
+
+def glued_to_latin_word(cased_text: str, start: int, end: int) -> bool:
+    """命中只是更长英文词的一部分时返回 True（product、Act 里的 ct，desktop 里的 top）。
+
+    数字、中文、标点相邻，或驼峰写法的词界（TOP1、做了CT、Top-K、hEGF、MVPs），仍算独立命中。
+    """
+    if end <= start:
+        return False
+
+    def letters(first: str, second: str) -> bool:
+        return first.isascii() and second.isascii() and first.isalpha() and second.isalpha()
+
+    if start > 0:
+        outer, inner = cased_text[start - 1], cased_text[start]
+        # 前面紧贴字母：只有小写接大写（hEGF、ProMax）算新词开头，其余都在同一个词里
+        if letters(outer, inner) and not (outer.islower() and inner.isupper()):
+            return True
+    if end < len(cased_text):
+        inner, outer = cased_text[end - 1], cased_text[end]
+        # 后面紧贴字母：大小写相同（maximum、CTO）在同一个词里，大小写切换（TopK、MVPs）算词尾
+        if letters(inner, outer) and inner.isupper() == outer.isupper():
+            return True
+    return False
+
+
+def is_short_term(term: str) -> bool:
+    """两个汉字以内，或三个英文字母、数字以内的词表词。"""
+    core = "".join(char for char in normalize(term) if char.isalnum())
+    if core.isascii():
+        return 0 < len(core) <= 3
+    return len(core) <= 2
 
 
 def selected_platforms(platform: str) -> set[str]:
@@ -93,11 +126,14 @@ def add_finding(
     product_type: str,
     commercial: str,
     deduplicate_span: bool = True,
+    short_hint: bool = False,
 ) -> None:
     span = (start, end)
     if deduplicate_span and span in occupied:
         return
     adjusted, context_note = context_adjustment(text, start, severity, category, product_type, commercial)
+    if short_hint:
+        adjusted, context_note = "hint", SHORT_TERM_HINT_NOTE
     findings.append(
         {
             "severity": adjusted,
@@ -166,14 +202,20 @@ def scan_full_lexicon(
     occupied: set[tuple[int, int]],
     product_type: str,
     commercial: str,
+    cased_text: str | None = None,
 ) -> None:
     selected = selected_platforms(platform)
+    if cased_text is None or len(cased_text) != len(normalized_text):
+        cased_text = normalized_text
     for entry in entries:
         active_platforms = [value for value in entry["platforms"] if value in selected]
         if not active_platforms:
             continue
         for term in entry.get("terms", []):
+            short_hint = commercial == "no" and is_short_term(term)
             for match in re.finditer(term_pattern(term), normalized_text, flags=re.IGNORECASE):
+                if glued_to_latin_word(cased_text, match.start(), match.end()):
+                    continue
                 severity = "review" if entry["match_mode"] == "context" else entry["severity"]
                 add_finding(
                     findings,
@@ -192,6 +234,7 @@ def scan_full_lexicon(
                     layer="full-lexicon",
                     product_type=product_type,
                     commercial=commercial,
+                    short_hint=short_hint,
                 )
 
 
@@ -265,6 +308,8 @@ def deduplicate_findings(findings: list[dict]) -> list[dict]:
                 for existing in accepted
                 if existing["category"] == item["category"]
                 and max(existing["start"], item["start"]) < min(existing["end"], item["end"])
+                # 短词提示不能挡掉同类别里需要定级的命中（“中医院自制”里的“中医”与“医院自制”）
+                and not (existing["severity"] == "hint" and item["severity"] != "hint")
             ),
             None,
         )
@@ -284,7 +329,17 @@ def scan(text: str, args: argparse.Namespace, reference_dir: Path) -> dict:
     findings: list[dict] = []
     occupied: set[tuple[int, int]] = set()
     scan_curated(text, normalized_text, args.platform, curated["rules"], findings, occupied, args.product_type, args.commercial)
-    scan_full_lexicon(text, normalized_text, args.platform, lexicon["entries"], findings, occupied, args.product_type, args.commercial)
+    scan_full_lexicon(
+        text,
+        normalized_text,
+        args.platform,
+        lexicon["entries"],
+        findings,
+        occupied,
+        args.product_type,
+        args.commercial,
+        cased_text=unicodedata.normalize("NFKC", text),
+    )
     scan_behavior_signals(text, normalized_text, args.platform, behaviors["rules"], findings, occupied, args.product_type, args.commercial)
     findings = deduplicate_findings(findings)
     counts = Counter(item["severity"] for item in findings)
@@ -296,35 +351,59 @@ def scan(text: str, args: argparse.Namespace, reference_dir: Path) -> dict:
         "rule_version": curated["version"],
         "coverage_version": coverage["version"],
         "coverage_scope": coverage["scope_statement"],
-        "counts": {key: counts.get(key, 0) for key in ("high", "medium", "review")},
+        "counts": {key: counts.get(key, 0) for key in ("high", "medium", "review", "hint")},
         "findings": findings,
         "behavior_rules_requiring_visual_review": 34 if args.platform in {"douyin", "both"} else 0,
     }
 
 
+def render_hints(hints: list[dict]) -> list[str]:
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for item in hints:
+        groups.setdefault((item["rule_term"], item["category"]), []).append(item)
+    lines = [
+        "## 短词提示（非商业内容，只提示不定级）",
+        "",
+        "词表里两个字以内的词（英文三个字母以内），在非商业内容里多半是普通用词。每个词看一眼首处语境：不是在替商品或服务做宣称就不用改；确实是宣称，按上面的级别处理。",
+        "",
+    ]
+    for (term, category), items in sorted(groups.items(), key=lambda pair: (-len(pair[1]), pair[1][0]["start"])):
+        lines.append(f"- `{term}` ×{len(items)}｜{category}｜首处：`{items[0]['excerpt']}`")
+    lines.append("")
+    return lines
+
+
 def render_markdown(result: dict) -> str:
-    findings = result["findings"]
+    graded = [item for item in result["findings"] if item["severity"] != "hint"]
+    hints = [item for item in result["findings"] if item["severity"] == "hint"]
     counts = result["counts"]
+    tally = f"- 命中：高风险 {counts['high']} / 需修改 {counts['medium']} / 人工复核 {counts['review']}"
+    if hints:
+        tally += f" / 短词提示 {len(hints)}"
     lines = [
         "# 发布前合规初筛",
         "",
         f"- 平台：{result['platform']}",
         f"- 输入类型：{result['input_kind']}",
         f"- 商品类型：{result['product_type']}",
-        f"- 命中：高风险 {counts['high']} / 需修改 {counts['medium']} / 人工复核 {counts['review']}",
+        tally,
         "",
         "## 结论",
         "",
     ]
-    if findings:
-        highest = SEVERITY_LABEL[findings[0]["severity"]]
+    if graded:
+        highest = SEVERITY_LABEL[graded[0]["severity"]]
         lines.append(f"最高风险级别：**{highest}**。命中只是定位证据，需结合完整语境、画面、商品资质和平台当前规则判断。")
+    elif hints:
+        lines.append("没有需要定级的文字命中，只有下方的短词提示；这不等于视频或文案保证合规，仍需完成下方非文本检查。")
     else:
         lines.append("未发现明显的文字规则命中；这不等于视频或文案保证合规，仍需完成下方非文本检查。")
     lines += ["", "## 命中项", ""]
-    if not findings:
-        lines.append("无文字命中。")
-    for index, item in enumerate(findings, start=1):
+    if not graded:
+        lines.append("无需要定级的文字命中。" if hints else "无文字命中。")
+        if hints:
+            lines.append("")
+    for index, item in enumerate(graded, start=1):
         platforms = ", ".join(item["platforms"])
         lines += [
             f"### {index}. {SEVERITY_LABEL[item['severity']]} | {platforms} | {item['category']}",
@@ -339,6 +418,8 @@ def render_markdown(result: dict) -> str:
         if item.get("source_refs"):
             lines.append(f"- 来源索引：{'；'.join(item['source_refs'])}")
         lines.append("")
+    if hints:
+        lines += render_hints(hints)
     lines += [
         "## 非文本必检",
         "",

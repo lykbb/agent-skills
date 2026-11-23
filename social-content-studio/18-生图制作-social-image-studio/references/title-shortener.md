@@ -118,11 +118,11 @@ The 1:1 short title is the **shortest** of the family. If you cannot shorten fur
 
 ## Workflow integration
 
-When a user task includes "公众号封面" or "WeChat cover", you should:
+The default WeChat deliverable is the `2.35:1` headline cover alone (see platform-specs.md). When the user explicitly asks for the `1:1` share cover as well, you should:
 
 1. Write the long title for 2.35:1 first.
 2. Apply this file's 5-step extraction to derive the 1:1 short title.
 3. Print both in the planning notes before rendering.
-4. Render both in the same HTML file, plus a `.pair-preview` section showing them side-by-side.
+4. Render both as separate frames in the same HTML file; add a `.pair-preview` section only when the user asks to see them side-by-side.
 
 If the user supplies only one title and asks for the pair, derive the short one yourself and call it out in the response (don't silently swap text — the user needs to confirm the shortening reads right).

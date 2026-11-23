@@ -7,7 +7,7 @@ Run this before final delivery.
 - Rednote images are `1080 x 1440`.
 - WeChat 2.35:1 cover is `2115 x 900`.
 - WeChat 1:1 cover is `1080 x 1080`.
-- WeChat pair preview exists in the same HTML when WeChat covers are requested.
+- WeChat covers: one `2.35:1` headline cover by default. The `1:1` share cover and the pair preview exist only when the user asked for them (see platform-specs.md).
 - File names are stable and ordered.
 
 ## Text
@@ -61,10 +61,10 @@ Open the rendered PNG. Mentally divide it into 4 horizontal bands of 360px each 
 A poster passes when:
 
 1. Total Filled + Justified empty ≥ 100%.
-2. Filled bands cover ≥ 75% canvas height (≥ 1080px of 1440px).
+2. Filled bands usually cover ≥ 75% canvas height (≥ 1080px of 1440px); a lower figure still passes when the whitespace is deliberate and balanced.
 3. No two adjacent bands are both "justified empty" — that creates a >25% void mid-poster.
 
-If failing: don't shrink the canvas, don't add decorative blobs. Either expand copy (more ledger items, longer paragraphs, supporting evidence row, marginalia column) or switch recipe (M07 → M04 for genuinely-short content; M03 → M11 to add a marginal column; thin ledger → M08 Tall Ledger with bigger rows).
+If failing: don't shrink the canvas, don't add decorative blobs, and don't pad the copy. Switch recipe or rebalance the spacing first; expand copy only with real material from the approved text (more ledger items, a supporting evidence row). Typical recipe switches: M07 → M04 for genuinely-short content; M03 → M11 to add a marginal column; thin ledger → M08 Tall Ledger with bigger rows.
 
 ### Programmatic Layout Checks
 

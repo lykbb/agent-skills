@@ -11,7 +11,7 @@ Create polished social card packages for Xiaohongshu/Rednote, WeChat Official Ac
 
 This skill is self-contained. It borrows visual principles from the Guizang PPT style system, but it must not edit the original PPT skill, its templates, or its references. If the original PPT skill is available, you may read it for reference only.
 
-Generated work must live in a task folder, not in the skill root. Default to `local-tests/<slug>/` inside this repository, or use the explicit output folder requested by the user. Do not create root-level task folders such as `social-card-*`, `livephoto-*`, `wechat-*`, `output/`, or loose rendered assets next to `SKILL.md`.
+Generated work must live in a task folder, not in the skill root. Default to a task folder inside the current content project (`<project>/<topic>/`, see production-workflow.md), or use the explicit output folder requested by the user. Do not create root-level task folders such as `social-card-*`, `livephoto-*`, `wechat-*`, `output/`, or loose rendered assets next to `SKILL.md`.
 
 ## What To Produce
 
@@ -22,7 +22,7 @@ Use this skill for:
 - Material-first Live Photo puzzle layouts when the user has high-quality video assets and wants single-video, two-grid, three-grid, or four-grid motion cards with little or no added text.
 - Triple Live Photo collages when the user has three short videos, three results, three viewpoints, or a high-information comparison that should stay inside one image-card unit.
 - Long-video intake for Live Photo: diagnose whether to trim, speed up, split into a triple collage, or ask the user for a specific time range before rendering.
-- WeChat Official Account cover pairs: one `2.35:1` main cover plus one `1:1` square cover, composed together in the same HTML for visual checking.
+- WeChat Official Account covers: one `2.35:1` main cover by default; a `1:1` square cover only when the user explicitly asks, built and delivered separately (see platform-specs.md).
 - Screenshot-heavy product posts, article covers, tutorial carousels, outdoor/lifestyle notes, AI/product update explainers.
 - Social images that need Guizang-style Swiss or editorial magazine layouts.
 
@@ -127,8 +127,8 @@ For Rednote:
 
 For WeChat:
 
-- Always produce a paired system: `2.35:1` main cover and `1:1` square cover.
-- Build both covers in the same HTML file and add a combined preview section so their visual relationship can be checked together.
+- Default to one `2.35:1` main cover (see platform-specs.md). Add the `1:1` square cover only when the user explicitly asks, and deliver it separately.
+- Add a combined preview section only when the user asks to check the two side by side.
 - `2.35:1` keeps the full or near-full title, subtitle, and one strong visual relation.
 - `1:1` uses a simplified short title derived from the long title: big centered type, no image by default, no cramped subtitles.
 
@@ -205,7 +205,7 @@ Replace the single placeholder poster after `<!-- POSTERS_HERE -->` with one `<s
 
 Default implementation pattern:
 
-- Create a task folder under `local-tests/<slug>/` by default, or inside the user-requested output folder. Never put generated task folders, rendered images, MOV files, `.pvt` packages, or downloaded sources in the skill root next to `SKILL.md`.
+- Create a task folder inside the current content project (`<project>/<topic>/`) by default, or inside the user-requested output folder. Never put generated task folders, rendered images, MOV files, `.pvt` packages, or downloaded sources in the skill root next to `SKILL.md`.
 - Put source images in `assets/`.
 - Start from the seed template copied in Step 4.5, not a blank file. Prefer changing only the `<!-- POSTERS_HERE -->` region page-to-page. If a task needs custom layout CSS, add one clearly named task-scoped block in the copied file and keep semantic defaults reset (`figure { margin:0; }`, no browser-default spacing surprises).
 - Use Playwright or a browser screenshot tool to export each `.poster` or `.cover` node.
@@ -319,14 +319,14 @@ Final response (after the user has reviewed or asked for auto-check) should incl
 ## Non-Negotiables
 
 - Never edit the original Guizang PPT skill or any upstream skill copied from elsewhere.
-- Never create generated work in the skill root. All task artifacts must be under `local-tests/<slug>/` by default, or under a user-requested output folder. Root-level generated folders like `social-card-*`, `livephoto-*`, `wechat-*`, and loose output assets are forbidden.
+- Never create generated work in the skill root. All task artifacts must be under the current content project's task folder by default, or under a user-requested output folder. Root-level generated folders like `social-card-*`, `livephoto-*`, `wechat-*`, and loose output assets are forbidden.
 - Do not create random decorative SVG ovals, blobs, rain drops, stickers, or meaningless circles.
 - Do not use nested cards or generic SaaS card layouts as the default.
 - Do not let text overflow, touch the edge, or collide with the footer band. Pin `.foot` with `margin-top: auto` inside a flex column, never with `position: absolute` over growing content.
 - When content overflows, measure the amount before editing. Small overflows should get small fixes: `1-40px` means nudge/tighten, `40-90px` means local compaction, `90-160px` means slight title or paragraph compression, and only `160px+` should trigger recipe changes or content removal. After fixing, check R8 bottom whitespace so the page does not swing from overflow to a giant empty lower band.
 - Do not let a title touch the next content block. Main display titles should usually keep at least `28px` below; local headings should keep at least `16px`. Use validator R9 before relying on visual inspection.
 - Do not let text become too small to read on mobile.
-- Do not write inline `font-size` + `font-weight` on display titles in Swiss. Use the typed classes (`.h-hero` / `.h-statement` / `.h-xl` / `.num-mega`). A 80-120px headline at weight 700-900 is not Swiss; "the larger, the lighter" is a hard rule.
+- Do not write inline `font-size` + `font-weight` on display titles in Swiss. Use the typed classes (`.h-hero` / `.h-statement` / `.h-xl` / `.num-mega`). A 80-120px headline at weight 700-900 is not Swiss; "the larger, the lighter" is the template default, and a heavier weight is used only when the user or the confirmed series baseline chose it.
 - Do not deliver Editorial posters with a flat paper background, mono labels on every row, and no atmosphere layer. Run the Editorial Identity Test in `references/style-system.md` — a serif title alone does not make a poster Editorial.
 - Do not fake data, release details, or percentages.
 - Do not crop faces, key UI text, or hardware/product details unless the user explicitly accepts it.
@@ -335,4 +335,4 @@ Final response (after the user has reviewed or asked for auto-check) should incl
 - Do not let result videos scroll through section boundaries in a shallow crop; this creates the "overlapping video" failure. Inspect contact sheets and choose a stable time window before packaging.
 - Do not guess the user's visual priority when enlarging/cropping video for readability. Offer the crop/enlarge tradeoff and apply it after the user confirms, unless the request already makes the focal region explicit.
 - Do not reuse a 2.35:1 cover by blindly cropping it into 1:1. Compose each ratio separately.
-- **3:4 卡必须吃满画布**。Content (text + image + data) 必须覆盖 ≥75% 画布高度。任何 >15% 画布高度的纯空白带都需要"留白理由"：(a) hero image 自带呼吸、(b) 单句宣言式 hero statement、(c) 段落顶/底 leading & trailing whitespace（前后总和 ≤15%）。**禁止用 `<div style="flex: 1"></div>` 上下夹击把内容塞到中段**——杂志页留白逻辑不适用于社交卡（杂志靠对开页吸收留白，社交卡逐张独立刷，欠填看着像 PPT 漏排）。Recipe-by-recipe 最小密度见 `references/layout-recipes.md` 每条 recipe 的「Minimum density」段。Render 后必须跑 `qa-checklist.md` 的 4 横带密度检查。
+- **3:4 卡的密度是参考值，不是闸门**（与 `references/layout-recipes.md` 的 Content density rule 同口径，2026-11-10 对齐）。Content (text + image + data) 通常覆盖 ≥75% 画布高度；内容不够时换配方或调间距，不为提高密度加字、加标签或加装饰。任何 >15% 画布高度的纯空白带都需要"留白理由"：(a) hero image 自带呼吸、(b) 单句宣言式 hero statement、(c) 段落顶/底 leading & trailing whitespace（前后总和 ≤15%）。**禁止用 `<div style="flex: 1"></div>` 上下夹击把内容塞到中段**——杂志页留白逻辑不适用于社交卡（杂志靠对开页吸收留白，社交卡逐张独立刷，欠填看着像 PPT 漏排）。Recipe-by-recipe 最小密度见 `references/layout-recipes.md` 每条 recipe 的「Minimum density」段。Render 后跑 `qa-checklist.md` 的 4 横带密度检查，结果作参考。

@@ -155,7 +155,8 @@
     }
 
     /* ---------- 6. Typography roles (Swiss extreme contrast) ----------
-       Hard rule: "the larger, the lighter"
+       Template default: "the larger, the lighter"
+       (an explicit user choice or the confirmed series baseline may go heavier)
        ≥ 200px → weight 200 (ExtraLight)
        Smaller text gets heavier weight (≥ 500). */
     .h-hero {
@@ -896,15 +897,16 @@
         <section class="poster square" id="wechat-1x1">…</section> 1:1
         <section class="poster wide"   id="wechat-21x9">…</section> 2.35:1
 
-      For WeChat covers, also include a <section class="pair-preview">
-      that places the 2.35:1 + 1:1 side-by-side for review.
+      For WeChat covers the default is one 2.35:1 frame. Add the 1:1 frame, or a
+      <section class="pair-preview"> placing the two side-by-side, only when the user asks.
 
       Hard rules every poster must honor:
         - exactly one --accent in the entire deck
         - no border-radius, no box-shadow, no gradients
         - card-ink / card-accent / card-fill / card-outlined are
           mutually exclusive — never combine on one node
-        - "the larger, the lighter": ≥ 200px must use weight 200
+        - "the larger, the lighter" by default: ≥ 200px uses weight 200 unless
+          the user or the confirmed series baseline chose a heavier title
     -->
 
     <!-- ============================================================

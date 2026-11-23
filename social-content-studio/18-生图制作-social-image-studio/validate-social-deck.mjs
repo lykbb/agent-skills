@@ -10,7 +10,7 @@
  * Rules implemented:
  *   R1  overflow              scrollHeight > clientHeight on the poster
  *   R2  footer collision      .foot is position:absolute AND content above reaches into its band
- *   R3  swiss bold display    .h-xl / .h-hero / .h-statement / .num-mega with computed weight >= 600
+ *   R3  swiss bold display    .h-xl / .h-hero / .h-statement / .num-mega with computed weight >= 600 (advisory)
  *   R4  min readable font     body/lead/caption/label/meta below the mobile-safe floor
  *   R5  4-band density        on 3:4 boards: <75% filled OR any under-filled band > 216px
  *   R6  h-xl hard cap         display title lines/chars exceed the per-board cap
@@ -281,7 +281,7 @@ for (const s of sections) {
       return out;
     }, DISPLAY_CLASSES);
     for (const b of bolds) {
-      fails.push({ rule: "R3", msg: `.${b.cls} "${b.text}" is ${b.size}px @ weight ${b.weight} — Swiss "larger = lighter" hard rule`, fix: "remove inline font-weight; use the typed class default (200-300)" });
+      warns.push({ rule: "R3", msg: `.${b.cls} "${b.text}" is ${b.size}px @ weight ${b.weight} — heavier than the Swiss template default ("larger = lighter")`, fix: "advisory: fine when the user or the confirmed series baseline chose a heavy display title; otherwise remove inline font-weight and use the typed class default (200-300)" });
     }
   }
 
@@ -383,11 +383,11 @@ for (const s of sections) {
     const total = bands.occ.reduce((a, b) => a + b, 0) / 4;
     const pct = (o) => Math.round(o * 100) + "%";
     if (total < 0.745) {
-      warns.push({ rule: "R5", msg: `density ${pct(total)} (bands ${bands.occ.map(pct).join(" / ")})`, fix: "expand copy or switch recipe — see qa-checklist.md 4-band density" });
+      warns.push({ rule: "R5", msg: `density ${pct(total)} (bands ${bands.occ.map(pct).join(" / ")})`, fix: "advisory: whitespace is allowed. Do not add copy, labels, or decoration to raise density; if the page reads unbalanced, rebalance spacing or switch recipe — see workflow-and-review.md step 4" });
     }
     for (let i = 0; i < 3; i++) {
       if (bands.occ[i] < 0.15 && bands.occ[i + 1] < 0.15) {
-        warns.push({ rule: "R5", msg: `bands ${i + 1}+${i + 2} both under-filled (${pct(bands.occ[i])} / ${pct(bands.occ[i + 1])}) — >25% void mid-poster`, fix: "expand body content or insert a marginalia column" });
+        warns.push({ rule: "R5", msg: `bands ${i + 1}+${i + 2} both under-filled (${pct(bands.occ[i])} / ${pct(bands.occ[i + 1])}) — >25% void mid-poster`, fix: "advisory: rebalance the vertical distribution of the existing blocks or switch recipe; do not invent body content or a marginalia column to fill the gap" });
         break;
       }
     }
