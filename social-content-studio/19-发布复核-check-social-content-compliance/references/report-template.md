@@ -36,6 +36,8 @@ For every finding provide:
 5. Minimal revision: preserve the user's intent and structure.
 6. Remaining proof/review: evidence, product qualification, authorization, activity details, or visual check still needed.
 
+Scanner `短词提示` items do not need full findings. Mention them in one line, and write a finding only for a hint that turns out to be a real claim.
+
 ## Platform behavior checklist
 
 ### Xiaohongshu

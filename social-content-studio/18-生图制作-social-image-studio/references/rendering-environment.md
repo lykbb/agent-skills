@@ -9,13 +9,13 @@
 使用实际可用的 Node 执行，脚本自带依赖探测：先找本 Skill可解析的Playwright，再找 SOCIAL_IMAGE_PLAYWRIGHT，最后检查 Codex 已有的捆绑运行时。浏览器优先 SOCIAL_IMAGE_BROWSER 或已安装Chrome，再检查已存在的Chromium；没有可用项就报告缺失，不下载浏览器。
 
 ```bash
-node scripts/render-social-card.mjs --html /项目目录/封面.html --selector '#cover' --output /项目目录/output/封面.png --width 1086 --height 1448
+node scripts/render-social-card.mjs --html /项目目录/封面.html --selector '#cover' --output /项目目录/output/封面.png --width 1080 --height 1440
 ```
 
 只检查和在内存中试渲染，不保存过程图：
 
 ```bash
-node scripts/render-social-card.mjs --html /项目目录/封面.html --selector '#cover' --width 1086 --height 1448 --check-only
+node scripts/render-social-card.mjs --html /项目目录/封面.html --selector '#cover' --width 1080 --height 1440 --check-only
 ```
 
 导出前审查：
@@ -36,7 +36,7 @@ node scripts/check-skill-docs.mjs
 
 两套种子保留为原型，生成项目从其中复制或从本组认可源继续。截图纹理路径已调整为项目根的 assets/screenshot-backgrounds；使用哪张就复制哪张。Editorial引用 assets/magazine-bg-webgl.js 时同步复制或内联，确认背景绘制后再截图。模板中的 cover.jpg 等为占位素材，不是缺失的 Skill 文件，制作时必须替换或删去未使用的图片区。
 
-字号与尺寸由系列决定，导出脚本只核对，不偷偷改变1086×1448为模板默认1080×1440。图标和字体未内置为完整字体包，不能称已嵌入Noto或Inter。WebGL保留软件渲染与原有2D回退，照片和截图保留真实内容。
+字号与尺寸由系列决定，导出脚本只核对、不缩放：`--width`、`--height` 填本组源文件的实际画布，新系列是模板默认的1080×1440；沿用旧系列时填它已确认的尺寸（如1086×1448）。两者对不上会报错退出，不会悄悄改尺寸。图标和字体未内置为完整字体包，不能称已嵌入Noto或Inter。WebGL保留软件渲染与原有2D回退，照片和截图保留真实内容。
 
 ## 实况专用
 

@@ -5,7 +5,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {launchBrowser} from './browser-runtime.mjs';
 const {values}=parseArgs({options:{html:{type:'string'},selector:{type:'string',default:'section.poster'},output:{type:'string'},width:{type:'string'},height:{type:'string'},browser:{type:'string'},'check-only':{type:'boolean',default:false},'allow-network':{type:'boolean',default:false},help:{type:'boolean',default:false}}});
-if(values.help){console.log('render-social-card.mjs --html /absolute/page.html --selector #poster [--output /absolute/card.png] [--width 1086 --height 1448] [--check-only] [--browser /absolute/chrome] [--allow-network]');process.exit(0);}
+if(values.help){console.log('render-social-card.mjs --html /absolute/page.html --selector #poster [--output /absolute/card.png] [--width 1080 --height 1440] [--check-only] [--browser /absolute/chrome] [--allow-network]');process.exit(0);}
 if(!values.html||!path.isAbsolute(values.html)||!fs.existsSync(values.html))throw new Error('--html must be an existing absolute file path');
 if(!values['check-only']&&(!values.output||!path.isAbsolute(values.output)))throw new Error('--output must be absolute unless --check-only');
 if(values.output&&fs.existsSync(values.output))throw new Error('Output already exists; choose a new version: '+values.output);

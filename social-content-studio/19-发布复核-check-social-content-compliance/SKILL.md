@@ -73,7 +73,7 @@ Options:
 - `--platform`: `xiaohongshu`, `douyin`, or `both`.
 - `--input-kind`: `title`, `body`, `voiceover`, `subtitle`, `ocr`, `cover`, `comment`, `video`, or `auto`.
 - `--product-type`: `ordinary`, `cosmetic`, `drug`, `device`, `health-food`, `medical-service`, or `unknown`.
-- `--commercial`: `yes`, `no`, or `unknown`.
+- `--commercial`: `yes`, `no`, or `unknown`. Pass `no` only for purely editorial content with no product link, sponsorship, affiliate relation, or paid offer; keep `unknown` when unsure.
 - `--format json` for structured downstream processing.
 
 The scanner uses three layers in order:
@@ -81,6 +81,11 @@ The scanner uses three layers in order:
 1. `references/rules.json`: curated strong claims and patterns.
 2. `references/full-terms.json`: every non-empty source cell from row 4 onward in the 24-column `违禁词.xlsx` matrix.
 3. `references/behavior-rules.json`: all 34 Douyin behavior categories and text-planning signals.
+
+Two matching notes for layer 2 (added 2026-11-10 after false positives on tech articles):
+
+- A Latin term does not fire inside a longer English word, so `CT` no longer hits `product` or `Act`, and `TOP` no longer hits `desktop`. Digits, Chinese characters, punctuation, or a camel-case boundary next to the term still count (`TOP1`, `做了CT`, `Top-K`, `hEGF`, `MVPs`).
+- With `--commercial no`, lexicon terms of two Chinese characters or fewer (three Latin letters or digits or fewer) are reported as `短词提示` instead of a risk level: one line per term with its count and first excerpt. Check that the word is not making a claim for a product or service, and leave ordinary narrative alone. Layers 1 and 3 keep their levels.
 
 Do not stop at the scanner. It cannot prove visual safety, authorization, truthfulness, product eligibility, or current platform policy.
 
@@ -113,6 +118,7 @@ Use these levels:
 - `需修改`: meaningful risk, missing boundary, incomplete activity rule, unsupported data, or wording that should be narrowed.
 - `人工复核`: context-dependent word, regulated-category boundary, visual-only issue, quotation/education context, unclear proof, or source/current-rule uncertainty.
 - `未发现明显风险`: no obvious issue in the material actually reviewed. Never call this guaranteed compliant.
+- `短词提示`: a short lexicon word in content scanned with `--commercial no`. It is not a risk level; do not rewrite ordinary wording because of it.
 
 Apply these context rules:
 
